@@ -98,8 +98,8 @@ function createHeaderTable(schoolInfo: SchoolInfo): Table {
       margins: {
         top: 100,
         bottom: 100,
-        left: 0,
-        right: 0,
+        left: 144,
+        right: 144,
       },
     });
   }
