@@ -25,16 +25,24 @@ export function DocumentPreview({
               Cabeçalho opcional
             </div>
           )}
-          <h3>Escola Caminhos do Saber</h3>
-          <p className="preview-document__meta">
-            Diretora: Maria Silva
-            <br />
-            Professora: Ana Souza
-            <br />
-            Aluno: ____________________
-            <br />
-            Turma: 1º Ano A · Data: 14/06/2026
-          </p>
+          <div className="preview-document__header-block">
+            <p className="preview-document__header-row">
+              ESCOLA CAMINHOS DO SABER
+            </p>
+            <p className="preview-document__header-row">
+              <strong>DIRETORA:</strong> MARIA SILVA
+            </p>
+            <p className="preview-document__header-row">
+              <strong>PROFESSORA:</strong> ANA SOUZA
+            </p>
+            <p className="preview-document__header-row">
+              <strong>ALUNO(A):</strong> ___________________________
+            </p>
+            <div className="preview-document__header-row preview-document__header-row--grade">
+              <span><strong>SÉRIE:</strong> 1º ANO A</span>
+              <span><strong>DATA:</strong> __ / __ / ____</span>
+            </div>
+          </div>
 
           <p className="preview-document__title">Atividade de Matemática</p>
           <p className="preview-document__statement">

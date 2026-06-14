@@ -1,13 +1,19 @@
 import {
   AlignmentType,
+  BorderStyle,
   Document,
+  FileChild,
   ImageRun,
   Packer,
   PageOrientation,
   Paragraph,
-  TabStopPosition,
+  Table,
+  TableCell,
+  TableRow,
+  Tab,
   TabStopType,
   TextRun,
+  WidthType,
   convertMillimetersToTwip,
 } from 'docx'
 import type { Activity, SchoolInfo } from '../types/document'
@@ -65,26 +71,203 @@ export function validateDocumentData(
   return errors
 }
 
+function createHeaderTable(schoolInfo: SchoolInfo): Table {
+  const rows: TableRow[] = []
+  const cellWidth = convertMillimetersToTwip(A4_WIDTH_MM - 2 * PAGE_MARGIN_MM) // 180mm
+
+  const createCell = (paragraph: Paragraph) => {
+    return new TableCell({
+      children: [paragraph],
+      width: {
+        size: cellWidth,
+        type: WidthType.DXA,
+      },
+      borders: {
+        top: { style: BorderStyle.NONE },
+        left: { style: BorderStyle.NONE },
+        right: { style: BorderStyle.NONE },
+        bottom: {
+          style: BorderStyle.SINGLE,
+          size: 6,
+          color: 'D3D3D3',
+        },
+      },
+      margins: {
+        top: 100,
+        bottom: 100,
+        left: 0,
+        right: 0,
+      },
+    });
+  }
+
+  // 1. Escola (All Caps)
+  rows.push(
+    new TableRow({
+      children: [
+        createCell(
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [
+              new TextRun({
+                text: toUppercase(schoolInfo.schoolName),
+                bold: true,
+                font: DOCUMENT_FONT,
+                size: DOCUMENT_FONT_SIZE,
+              }),
+            ],
+          }),
+        ),
+      ],
+    }),
+  )
+
+  // 2. Diretora (optional)
+  if (schoolInfo.directorName.trim()) {
+    rows.push(
+      new TableRow({
+        children: [
+          createCell(
+            new Paragraph({
+              alignment: AlignmentType.LEFT,
+              children: [
+                new TextRun({
+                  text: 'DIRETORA: ',
+                  bold: true,
+                  font: DOCUMENT_FONT,
+                  size: DOCUMENT_FONT_SIZE,
+                }),
+                new TextRun({
+                  text: toUppercase(schoolInfo.directorName),
+                  font: DOCUMENT_FONT,
+                  size: DOCUMENT_FONT_SIZE,
+                }),
+              ],
+            }),
+          ),
+        ],
+      }),
+    )
+  }
+
+  // 3. Professora
+  rows.push(
+    new TableRow({
+      children: [
+        createCell(
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [
+              new TextRun({
+                text: 'PROFESSORA: ',
+                bold: true,
+                font: DOCUMENT_FONT,
+                size: DOCUMENT_FONT_SIZE,
+              }),
+              new TextRun({
+                text: toUppercase(schoolInfo.teacherName),
+                font: DOCUMENT_FONT,
+                size: DOCUMENT_FONT_SIZE,
+              }),
+            ],
+          }),
+        ),
+      ],
+    }),
+  )
+
+  // 4. Aluno
+  rows.push(
+    new TableRow({
+      children: [
+        createCell(
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [
+              new TextRun({
+                text: 'ALUNO(A): ',
+                bold: true,
+                font: DOCUMENT_FONT,
+                size: DOCUMENT_FONT_SIZE,
+              }),
+              new TextRun({
+                text: '______________________________________________________',
+                font: DOCUMENT_FONT,
+                size: DOCUMENT_FONT_SIZE,
+              }),
+            ],
+          }),
+        ),
+      ],
+    }),
+  )
+
+  // 5. Série & Data
+  const grade = toUppercase(schoolInfo.gradeName)
+
+  rows.push(
+    new TableRow({
+      children: [
+        createCell(
+          new Paragraph({
+            alignment: AlignmentType.LEFT,
+            children: [
+              new TextRun({
+                text: `SÉRIE: ${grade}`,
+                bold: true,
+                font: DOCUMENT_FONT,
+                size: DOCUMENT_FONT_SIZE,
+              }),
+              new Tab(),
+              new TextRun({
+                text: 'DATA: __ / __ / ____',
+                bold: true,
+                font: DOCUMENT_FONT,
+                size: DOCUMENT_FONT_SIZE,
+              }),
+            ],
+            tabStops: [
+              {
+                type: TabStopType.RIGHT,
+                position: cellWidth,
+              },
+            ],
+          }),
+        ),
+      ],
+    }),
+  )
+
+  return new Table({
+    width: {
+      size: cellWidth,
+      type: WidthType.DXA,
+    },
+    columnWidths: [cellWidth],
+    borders: {
+      top: { style: BorderStyle.NONE },
+      left: { style: BorderStyle.NONE },
+      right: { style: BorderStyle.NONE },
+      bottom: { style: BorderStyle.NONE },
+      insideHorizontal: { style: BorderStyle.NONE },
+      insideVertical: { style: BorderStyle.NONE },
+    },
+    rows,
+  })
+}
+
 export async function generateDocx(
   schoolInfo: SchoolInfo,
   activities: Activity[],
 ): Promise<Blob> {
-  const children: Paragraph[] = []
+  const children: FileChild[] = []
 
   if (schoolInfo.headerImage) {
     const headerImage = await prepareImage(schoolInfo.headerImage)
     children.push(createImageParagraph(headerImage, 120))
   }
 
-  children.push(createUppercaseParagraph(schoolInfo.schoolName, true))
-
-  if (schoolInfo.directorName.trim()) {
-    children.push(createLabelParagraph('DIRETORA', schoolInfo.directorName))
-  }
-
-  children.push(createLabelParagraph('PROFESSORA', schoolInfo.teacherName))
-  children.push(createUppercaseParagraph('ALUNO(A):___________________________', true))
-  children.push(createGradeAndDateParagraph(schoolInfo.gradeName))
+  children.push(createHeaderTable(schoolInfo))
 
   children.push(new Paragraph({ spacing: { after: 120 } }))
 
@@ -150,72 +333,6 @@ export async function generateDocx(
   return Packer.toBlob(document)
 }
 
-function createLabelParagraph(label: string, value: string): Paragraph {
-  return new Paragraph({
-    children: [
-      new TextRun({
-        text: `${label}: `,
-        bold: true,
-        font: DOCUMENT_FONT,
-        size: DOCUMENT_FONT_SIZE,
-      }),
-      new TextRun({
-        text: toUppercase(value),
-        font: DOCUMENT_FONT,
-        size: DOCUMENT_FONT_SIZE,
-      }),
-    ],
-    spacing: {
-      after: 40,
-    },
-  })
-}
-
-function createUppercaseParagraph(text: string, bold = false): Paragraph {
-  return new Paragraph({
-    children: [
-      new TextRun({
-        text: toUppercase(text),
-        bold,
-        font: DOCUMENT_FONT,
-        size: DOCUMENT_FONT_SIZE,
-      }),
-    ],
-    spacing: {
-      after: 40,
-    },
-  })
-}
-
-function createGradeAndDateParagraph(gradeName: string): Paragraph {
-  const grade = toUppercase(gradeName)
-
-  return new Paragraph({
-    children: [
-      new TextRun({
-        text: `SÉRIE: ${grade}`,
-        bold: true,
-        font: DOCUMENT_FONT,
-        size: DOCUMENT_FONT_SIZE,
-      }),
-      new TextRun({
-        text: '\tDATA: __ / __ / ____',
-        bold: true,
-        font: DOCUMENT_FONT,
-        size: DOCUMENT_FONT_SIZE,
-      }),
-    ],
-    tabStops: [
-      {
-        type: TabStopType.RIGHT,
-        position: TabStopPosition.MAX,
-      },
-    ],
-    spacing: {
-      after: 40,
-    },
-  })
-}
 
 function toUppercase(value: string): string {
   return value.trim().toLocaleUpperCase('pt-BR')
