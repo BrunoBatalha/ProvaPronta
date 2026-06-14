@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { ActivityInfoForm } from './components/activity/ActivityInfoForm'
 import { ActivityList } from './components/activities/ActivityList'
@@ -18,14 +18,18 @@ import {
   validateDocumentData,
 } from './lib/generateDocx'
 import type { Activity, SchoolInfo } from './types/document'
+import defaultHeaderImage from './assets/header-ceph.png'
+
+const searchParams = new URLSearchParams(window.location.search)
+const useCephDefaults = searchParams.get('s') === 'ceph'
 
 const initialSchoolInfo: SchoolInfo = {
-  schoolName: '',
-  directorName: '',
-  teacherName: '',
+  schoolName: useCephDefaults ? 'CENTRO EDUCACIONAL PARQUE DAS HORTÊNSIAS' : '',
+  directorName: useCephDefaults ? 'MARIA VILANE BESSA SEGUNDO' : '',
+  teacherName: useCephDefaults ? 'INGRID LIMA SOARES' : '',
   gradeName: '',
   headerImage: undefined,
-  headerImagePreviewUrl: undefined,
+  headerImagePreviewUrl: useCephDefaults ? defaultHeaderImage : undefined,
 }
 
 type GenerationStatus = 'idle' | 'generating' | 'success' | 'error'
@@ -36,6 +40,31 @@ function App() {
   const [generationStatus, setGenerationStatus] =
     useState<GenerationStatus>('idle')
   const [generationErrors, setGenerationErrors] = useState<string[]>([])
+
+  useEffect(() => {
+    if (!useCephDefaults) return
+
+    fetch(defaultHeaderImage)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const file = new File([blob], 'header-ceph.png', { type: 'image/png' })
+        const previewUrl = URL.createObjectURL(file)
+        setSchoolInfo((prev) => {
+          if (prev.headerImagePreviewUrl === defaultHeaderImage) {
+            return {
+              ...prev,
+              headerImage: file,
+              headerImagePreviewUrl: previewUrl,
+            }
+          }
+          URL.revokeObjectURL(previewUrl)
+          return prev
+        })
+      })
+      .catch((err) => {
+        console.error('Erro ao carregar imagem padrão de cabeçalho:', err)
+      })
+  }, [])
 
   function handleAddActivity() {
     setActivities((currentActivities) => [

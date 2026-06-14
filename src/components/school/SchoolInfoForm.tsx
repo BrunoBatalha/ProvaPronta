@@ -16,7 +16,7 @@ export function SchoolInfoForm({
 
   useEffect(() => {
     return () => {
-      if (value.headerImagePreviewUrl) {
+      if (value.headerImagePreviewUrl && value.headerImagePreviewUrl.startsWith('blob:')) {
         URL.revokeObjectURL(value.headerImagePreviewUrl)
       }
     }
