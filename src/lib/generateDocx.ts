@@ -23,8 +23,11 @@ import type { Activity, SchoolInfo } from '../types/document'
 
 const A4_WIDTH_MM = 210
 const A4_HEIGHT_MM = 297
-const PAGE_MARGIN_MM = 15
-const CONTENT_WIDTH_PX = 680
+const MARGIN_TOP_MM = 9.5
+const MARGIN_BOTTOM_MM = 7.8
+const MARGIN_LEFT_MM = 10
+const MARGIN_RIGHT_MM = 10
+const CONTENT_WIDTH_PX = 718
 const DOCUMENT_FONT = 'Arial'
 const DOCUMENT_FONT_SIZE = 24
 
@@ -76,7 +79,7 @@ export function validateDocumentData(
 
 function createHeaderTable(schoolInfo: SchoolInfo): Table {
   const rows: TableRow[] = []
-  const cellWidth = convertMillimetersToTwip(A4_WIDTH_MM - 2 * PAGE_MARGIN_MM) // 180mm
+  const cellWidth = convertMillimetersToTwip(A4_WIDTH_MM - MARGIN_LEFT_MM - MARGIN_RIGHT_MM) // 190mm
 
   const createCell = (paragraph: Paragraph) => {
     return new TableCell({
@@ -321,10 +324,10 @@ export async function generateDocx(
               height: convertMillimetersToTwip(A4_HEIGHT_MM),
             },
             margin: {
-              top: convertMillimetersToTwip(PAGE_MARGIN_MM),
-              right: convertMillimetersToTwip(PAGE_MARGIN_MM),
-              bottom: convertMillimetersToTwip(PAGE_MARGIN_MM),
-              left: convertMillimetersToTwip(PAGE_MARGIN_MM),
+              top: convertMillimetersToTwip(MARGIN_TOP_MM),
+              right: convertMillimetersToTwip(MARGIN_RIGHT_MM),
+              bottom: convertMillimetersToTwip(MARGIN_BOTTOM_MM),
+              left: convertMillimetersToTwip(MARGIN_LEFT_MM),
             },
             borders: {
               pageBorderTop: {
