@@ -2,13 +2,17 @@ import type { Activity } from '../../types/document'
 
 type DocumentPreviewProps = {
   headerImagePreviewUrl?: string
+  activityTitle: string
   activities: Activity[]
 }
 
 export function DocumentPreview({
   headerImagePreviewUrl,
+  activityTitle,
   activities,
 }: DocumentPreviewProps) {
+  const previewTitle = activityTitle.trim() || 'Atividades'
+
   return (
     <div className="preview-card">
       <div className="preview-card__header">
@@ -52,7 +56,7 @@ export function DocumentPreview({
             </div>
           </div>
 
-          <p className="preview-document__title">Atividades</p>
+          <p className="preview-document__title">{previewTitle}</p>
           {activities.length > 0 ? (
             <div className="preview-document__activities">
               {activities.map((activity, index) => (

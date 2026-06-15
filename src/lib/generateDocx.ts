@@ -275,7 +275,28 @@ export async function generateDocx(
 
   children.push(createHeaderTable(schoolInfo))
 
-  children.push(new Paragraph({ spacing: { after: 120 } }))
+  const activityTitle = schoolInfo.activityTitle.trim()
+
+  if (activityTitle) {
+    children.push(
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        children: [
+          new TextRun({
+            text: activityTitle,
+            font: DOCUMENT_FONT,
+            size: DOCUMENT_FONT_SIZE,
+          }),
+        ],
+        spacing: {
+          before: 120,
+          after: 120,
+        },
+      }),
+    )
+  } else {
+    children.push(new Paragraph({ spacing: { after: 120 } }))
+  }
 
   for (const [index, activity] of activities.entries()) {
     if (!activity.image) {

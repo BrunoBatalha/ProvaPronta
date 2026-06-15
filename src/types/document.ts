@@ -2,6 +2,7 @@ export type SchoolInfo = {
   schoolName: string
   directorName: string
   teacherName: string
+  activityTitle: string
   gradeName: string
   headerImage?: File
   headerImagePreviewUrl?: string

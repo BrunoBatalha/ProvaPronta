@@ -28,6 +28,7 @@ const initialSchoolInfo: SchoolInfo = {
   schoolName: useCephDefaults ? 'CENTRO EDUCACIONAL PARQUE DAS HORTÊNSIAS' : '',
   directorName: useCephDefaults ? 'MARIA VILANE BESSA SEGUNDO' : '',
   teacherName: useCephDefaults ? 'INGRID LIMA SOARES' : '',
+  activityTitle: '',
   gradeName: '',
   headerImage: undefined,
   headerImagePreviewUrl: useCephDefaults ? defaultHeaderImage : undefined,
@@ -162,6 +163,13 @@ function App() {
             description="Organize as informações que aparecerão no cabeçalho do documento."
           >
             <ActivityInfoForm
+              activityTitle={schoolInfo.activityTitle}
+              onActivityTitleChange={(activityTitle) => {
+                setSchoolInfo((currentSchoolInfo) => ({
+                  ...currentSchoolInfo,
+                  activityTitle,
+                }))
+              }}
               gradeName={schoolInfo.gradeName}
               onGradeNameChange={(gradeName) => {
                 setSchoolInfo((currentSchoolInfo) => ({
@@ -189,6 +197,7 @@ function App() {
         <aside className="workspace__preview" aria-label="Prévia do documento">
           <DocumentPreview
             headerImagePreviewUrl={schoolInfo.headerImagePreviewUrl}
+            activityTitle={schoolInfo.activityTitle}
             activities={activities}
           />
         </aside>
