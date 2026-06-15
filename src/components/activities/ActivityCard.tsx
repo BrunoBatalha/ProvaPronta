@@ -1,6 +1,6 @@
-import { useState, type ChangeEvent } from 'react'
-import { validateActivityImage } from '../../lib/activityUtils'
+import type { ChangeEvent } from 'react'
 import type { Activity } from '../../types/document'
+import { ActivityImageUpload } from './ActivityImageUpload'
 
 type ActivityCardProps = {
   activity: Activity
@@ -15,35 +15,10 @@ export function ActivityCard({
   onChange,
   onRemove,
 }: ActivityCardProps) {
-  const [imageError, setImageError] = useState<string>()
   const statementId = `activity-${activity.id}-statement`
-  const imageId = `activity-${activity.id}-image`
-  const imageErrorId = `${imageId}-error`
 
   function handleStatementChange(event: ChangeEvent<HTMLTextAreaElement>) {
     onChange({ statement: event.target.value })
-  }
-
-  function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0]
-
-    if (!file) {
-      setImageError(undefined)
-      onChange({ image: undefined })
-      return
-    }
-
-    const error = validateActivityImage(file)
-
-    if (error) {
-      event.target.value = ''
-      setImageError(error)
-      onChange({ image: undefined })
-      return
-    }
-
-    setImageError(undefined)
-    onChange({ image: file })
   }
 
   return (
@@ -75,30 +50,11 @@ export function ActivityCard({
         />
       </div>
 
-      <div className="form-field">
-        <div className="form-field__label-row">
-          <label htmlFor={imageId}>Imagem da atividade</label>
-          <span>Obrigatório</span>
-        </div>
-        <input
-          id={imageId}
-          name={`activities.${activity.id}.image`}
-          type="file"
-          accept=".png,.jpg,.jpeg,image/png,image/jpeg"
-          onChange={handleImageChange}
-          aria-describedby={imageError ? imageErrorId : undefined}
-          aria-invalid={imageError ? true : undefined}
-          required
-        />
-        <p className="form-field__help">
-          Envie uma imagem em PNG, JPG ou JPEG de até 5 MB.
-        </p>
-        {imageError ? (
-          <p id={imageErrorId} className="form-field__error" role="alert">
-            {imageError}
-          </p>
-        ) : null}
-      </div>
+      <ActivityImageUpload
+        activity={activity}
+        number={number}
+        onChange={onChange}
+      />
     </article>
   )
 }

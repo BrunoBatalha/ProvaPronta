@@ -11,6 +11,11 @@ export function createActivity(createId: ActivityIdFactory): Activity {
     id: createId(),
     statement: '',
     image: undefined,
+    originalImage: undefined,
+    originalImageUrl: undefined,
+    imagePreviewUrl: undefined,
+    cropArea: undefined,
+    cropAspect: undefined,
   }
 }
 
@@ -31,6 +36,16 @@ export function removeActivity(
   activityId: string,
 ): Activity[] {
   return activities.filter((activity) => activity.id !== activityId)
+}
+
+export function revokeActivityImageUrls(activity: Activity): void {
+  if (activity.originalImageUrl) {
+    URL.revokeObjectURL(activity.originalImageUrl)
+  }
+
+  if (activity.imagePreviewUrl) {
+    URL.revokeObjectURL(activity.imagePreviewUrl)
+  }
 }
 
 export function validateActivityImage(file: File): string | undefined {
