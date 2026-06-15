@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './App.css'
 import { ActivityInfoForm } from './components/activity/ActivityInfoForm'
 import { ActivityList } from './components/activities/ActivityList'
@@ -11,6 +11,7 @@ import { StepCard } from './components/ui/StepCard'
 import {
   createActivity,
   removeActivity,
+  revokeActivityImageUrls,
   updateActivity,
 } from './lib/activityUtils'
 import {
@@ -37,6 +38,7 @@ type GenerationStatus = 'idle' | 'generating' | 'success' | 'error'
 function App() {
   const [schoolInfo, setSchoolInfo] = useState(initialSchoolInfo)
   const [activities, setActivities] = useState<Activity[]>([])
+  const activitiesRef = useRef(activities)
   const [generationStatus, setGenerationStatus] =
     useState<GenerationStatus>('idle')
   const [generationErrors, setGenerationErrors] = useState<string[]>([])
@@ -66,6 +68,16 @@ function App() {
       })
   }, [])
 
+  useEffect(() => {
+    activitiesRef.current = activities
+  }, [activities])
+
+  useEffect(() => {
+    return () => {
+      activitiesRef.current.forEach(revokeActivityImageUrls)
+    }
+  }, [])
+
   function handleAddActivity() {
     setActivities((currentActivities) => [
       ...currentActivities,
@@ -83,9 +95,17 @@ function App() {
   }
 
   function handleRemoveActivity(activityId: string) {
-    setActivities((currentActivities) =>
-      removeActivity(currentActivities, activityId),
-    )
+    setActivities((currentActivities) => {
+      const activityToRemove = currentActivities.find(
+        (activity) => activity.id === activityId,
+      )
+
+      if (activityToRemove) {
+        revokeActivityImageUrls(activityToRemove)
+      }
+
+      return removeActivity(currentActivities, activityId)
+    })
   }
 
   async function handleGenerateDocument() {
@@ -169,6 +189,7 @@ function App() {
         <aside className="workspace__preview" aria-label="Prévia do documento">
           <DocumentPreview
             headerImagePreviewUrl={schoolInfo.headerImagePreviewUrl}
+            activities={activities}
           />
         </aside>
 

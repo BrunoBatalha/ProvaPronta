@@ -515,6 +515,156 @@
   background: var(--color-surface);
 }
 
+.activity-image-upload__input {
+  position: absolute;
+  width: 1px !important;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.activity-image-upload,
+.activity-image-upload__actions {
+  display: grid;
+  gap: 12px;
+}
+
+.activity-image-upload__preview {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+}
+
+.activity-image-upload__actions {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.activity-image-upload__actions .secondary-button,
+.activity-image-upload__actions .danger-button {
+  width: 100%;
+}
+
+.activity-image-upload__select {
+  display: grid;
+  width: 100%;
+  min-height: 132px;
+  gap: 6px;
+  place-content: center;
+  padding: 20px;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  text-align: center;
+  background: var(--color-primary-subtle);
+  cursor: pointer;
+}
+
+.activity-image-upload__select:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.activity-image-upload__select span {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.crop-modal {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  padding: 20px;
+  place-items: center;
+  background: rgb(15 23 42 / 72%);
+}
+
+.crop-modal__panel {
+  display: grid;
+  width: min(100%, 760px);
+  max-height: calc(100dvh - 40px);
+  gap: 18px;
+  overflow: auto;
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-floating);
+}
+
+.crop-modal__loading {
+  padding: 24px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-weight: 600;
+  background: var(--color-surface);
+}
+
+.crop-modal__header h2,
+.crop-modal__header p,
+.crop-modal__help {
+  margin: 0;
+}
+
+.crop-modal__header h2 {
+  font-size: 1.25rem;
+}
+
+.crop-modal__header p {
+  margin-top: 6px;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.crop-modal__surface {
+  position: relative;
+  min-height: min(52dvh, 460px);
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: #0f172a;
+}
+
+.crop-modal__controls {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 10px 16px;
+  align-items: center;
+}
+
+.crop-modal__controls label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.crop-modal__controls input[type="range"] {
+  width: 100%;
+  min-height: 44px;
+  accent-color: var(--color-primary);
+}
+
+.crop-modal__help {
+  grid-column: 2;
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.crop-modal__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.crop-modal__actions .primary-button,
+.crop-modal__actions .secondary-button {
+  width: 100%;
+}
+
 .generate-card {
   display: grid;
   gap: 20px;
@@ -643,6 +793,25 @@
     var(--color-background);
 }
 
+.preview-document__activities,
+.preview-document__activity {
+  display: grid;
+  gap: 12px;
+}
+
+.preview-document__activity + .preview-document__activity {
+  padding-top: 14px;
+  border-top: 1px solid var(--color-border);
+}
+
+.preview-document__activity-image {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  border-radius: 3px;
+}
+
 .preview-card__note {
   margin: 0;
   padding: 0 24px 22px;
@@ -769,6 +938,40 @@
     flex-direction: column;
   }
 
+  .activity-image-upload__actions {
+    grid-template-columns: 1fr;
+  }
+
+  .crop-modal {
+    padding: 0;
+  }
+
+  .crop-modal__panel {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    padding: 16px;
+    border-radius: 0;
+  }
+
+  .crop-modal__surface {
+    min-height: 46dvh;
+  }
+
+  .crop-modal__controls {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .crop-modal__help {
+    grid-column: auto;
+    margin-bottom: 8px;
+  }
+
+  .crop-modal__actions {
+    grid-template-columns: 1fr;
+  }
+
   .danger-button {
     width: 100%;
   }
@@ -790,7 +993,8 @@
 
   .primary-button,
   .secondary-button,
-  .danger-button {
+  .danger-button,
+  .activity-image-upload__select {
     transition: none;
   }
 }

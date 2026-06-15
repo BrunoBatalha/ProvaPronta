@@ -530,7 +530,10 @@ Para o MVP:
 * Imagens das atividades devem ocupar a largura útil da página;
 * Não se preocupar inicialmente com quebra de página;
 * Se a imagem for grande e pular para outra página, aceitar esse comportamento;
-* Não cortar a imagem;
+* Após selecionar uma imagem de atividade, abrir um editor simples de recorte;
+* Permitir ajustar livremente o formato, a posição e o zoom do recorte;
+* Usar a imagem recortada na prévia e no documento final;
+* Manter a imagem original apenas no navegador para permitir editar o recorte;
 * Manter proporção da imagem;
 * Redimensionar apenas para caber na largura útil.
 

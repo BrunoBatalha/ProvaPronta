@@ -1,9 +1,13 @@
+import type { Activity } from '../../types/document'
+
 type DocumentPreviewProps = {
   headerImagePreviewUrl?: string
+  activities: Activity[]
 }
 
 export function DocumentPreview({
   headerImagePreviewUrl,
+  activities,
 }: DocumentPreviewProps) {
   return (
     <div className="preview-card">
@@ -39,16 +43,51 @@ export function DocumentPreview({
               <strong>ALUNO(A):</strong> ___________________________
             </p>
             <div className="preview-document__header-row preview-document__header-row--grade">
-              <span><strong>SÉRIE:</strong> 1º ANO A</span>
-              <span><strong>DATA:</strong> __ / __ / ____</span>
+              <span>
+                <strong>SÉRIE:</strong> 1º ANO A
+              </span>
+              <span>
+                <strong>DATA:</strong> __ / __ / ____
+              </span>
             </div>
           </div>
 
-          <p className="preview-document__title">Atividade de Matemática</p>
-          <p className="preview-document__statement">
-            <strong>1.</strong> Pinte as figuras que têm a forma de um círculo.
-          </p>
-          <div className="preview-document__image">Imagem da atividade</div>
+          <p className="preview-document__title">Atividades</p>
+          {activities.length > 0 ? (
+            <div className="preview-document__activities">
+              {activities.map((activity, index) => (
+                <div
+                  className="preview-document__activity"
+                  key={activity.id}
+                >
+                  <p className="preview-document__statement">
+                    <strong>{index + 1}.</strong>{' '}
+                    {activity.statement.trim() || 'Enunciado da atividade'}
+                  </p>
+                  {activity.imagePreviewUrl ? (
+                    <img
+                      className="preview-document__activity-image"
+                      src={activity.imagePreviewUrl}
+                      alt={`Imagem da atividade ${index + 1}`}
+                    />
+                  ) : (
+                    <div className="preview-document__image">
+                      Imagem da atividade
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <p className="preview-document__statement">
+                <strong>1.</strong> O enunciado aparecerá aqui.
+              </p>
+              <div className="preview-document__image">
+                Imagem da atividade
+              </div>
+            </>
+          )}
         </div>
       </div>
 
