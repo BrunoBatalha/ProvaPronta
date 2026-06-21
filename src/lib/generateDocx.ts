@@ -14,6 +14,7 @@ import {
   TableCell,
   TableRow,
   Tab,
+  TabStopPosition,
   TabStopType,
   TextRun,
   WidthType,
@@ -224,9 +225,8 @@ function createHeaderTable(schoolInfo: SchoolInfo): Table {
                 font: DOCUMENT_FONT,
                 size: DOCUMENT_FONT_SIZE,
               }),
-              new Tab(),
               new TextRun({
-                text: 'DATA: __ / __ / ____',
+                children: [new Tab(), 'DATA: __ / __ / ____'],
                 bold: true,
                 font: DOCUMENT_FONT,
                 size: DOCUMENT_FONT_SIZE,
@@ -235,7 +235,7 @@ function createHeaderTable(schoolInfo: SchoolInfo): Table {
             tabStops: [
               {
                 type: TabStopType.RIGHT,
-                position: cellWidth,
+                position: TabStopPosition.MAX,
               },
             ],
           }),
