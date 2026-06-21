@@ -7,7 +7,6 @@ import type {
 export const DEFAULT_PERIODS_PER_DAY = 4
 export const MIN_PERIODS_PER_DAY = 1
 export const MAX_PERIODS_PER_DAY = 8
-export const MAX_WEEKLY_PLAN_DAYS = 7
 
 export function createInitialWeeklyLessonPlan(): WeeklyLessonPlan {
   return {
@@ -73,14 +72,6 @@ export function validateWeeklyLessonPlan(plan: WeeklyLessonPlan): string[] {
 
   if (plan.startDate && plan.endDate && plan.endDate < plan.startDate) {
     errors.push('A data final precisa ser depois da data inicial.')
-  }
-
-  if (
-    plan.startDate &&
-    plan.endDate &&
-    countDaysInRange(plan.startDate, plan.endDate) > MAX_WEEKLY_PLAN_DAYS
-  ) {
-    errors.push('Selecione no máximo 7 dias para o plano semanal.')
   }
 
   if (!Number.isInteger(plan.periodsPerDay)) {

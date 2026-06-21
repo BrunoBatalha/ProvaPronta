@@ -1,5 +1,5 @@
 import { DatePicker, Portal, parseDate, type DateValue } from '@chakra-ui/react'
-import type { ChangeEvent } from 'react'
+import { useState, type ChangeEvent, type FormEvent } from 'react'
 import type {
   WeeklyLessonDay,
   WeeklyLessonMoment,
@@ -26,6 +26,10 @@ export function WeeklyLessonPlanForm({
     value.startDate ? parseDate(formatDateForDatePicker(value.startDate)) : null,
     value.endDate ? parseDate(formatDateForDatePicker(value.endDate)) : null,
   ].filter(Boolean) as DateValue[]
+
+  const [expandedDayId, setExpandedDayId] = useState<string | null>(
+    value.days.length > 0 ? value.days[0].id : null
+  )
 
   function handleDateRangeChange(dateValues: DateValue[]) {
     const [startDateValue, endDateValue] = dateValues
@@ -152,7 +156,7 @@ export function WeeklyLessonPlanForm({
             </Portal>
           </DatePicker.Root>
           <p className="form-field__help">
-            Escolha até 7 dias. O formulário cria um bloco para cada dia.
+            O formulário criará um bloco para cada dia.
           </p>
         </div>
 
@@ -213,8 +217,26 @@ export function WeeklyLessonPlanForm({
             <WeeklyLessonDayBlock
               day={day}
               key={day.id}
+              isExpanded={expandedDayId === day.id}
+              onToggleExpand={() =>
+                setExpandedDayId(expandedDayId === day.id ? null : day.id)
+              }
               onDayChange={handleDayChange}
               onMomentChange={handleMomentChange}
+              onCopyFromPrevious={(dayId, momentId) => {
+                const dayIndex = value.days.findIndex((d) => d.id === dayId)
+                if (dayIndex === -1) return
+                const d = value.days[dayIndex]
+                const mIndex = d.moments.findIndex((m) => m.id === momentId)
+                if (mIndex > 0) {
+                  const prev = d.moments[mIndex - 1]
+                  handleMomentChange(dayId, momentId, {
+                    content: prev.content,
+                    classExercises: prev.classExercises,
+                    skills: prev.skills,
+                  })
+                }
+              }}
             />
           ))}
         </div>
@@ -234,6 +256,8 @@ export function WeeklyLessonPlanForm({
 
 type WeeklyLessonDayBlockProps = {
   day: WeeklyLessonDay
+  isExpanded: boolean
+  onToggleExpand: () => void
   onDayChange: (
     dayId: string,
     changes: Partial<Pick<WeeklyLessonDay, 'theme' | 'objective'>>,
@@ -245,62 +269,185 @@ type WeeklyLessonDayBlockProps = {
       Pick<WeeklyLessonMoment, 'content' | 'classExercises' | 'skills'>
     >,
   ) => void
+  onCopyFromPrevious: (dayId: string, momentId: string) => void
+}
+
+function handleTextareaResize(event: FormEvent<HTMLTextAreaElement>) {
+  const target = event.currentTarget
+  target.style.height = 'auto'
+  target.style.height = `${target.scrollHeight}px`
+}
+
+function isDayComplete(day: WeeklyLessonDay) {
+  if (!day.theme.trim() || !day.objective.trim()) return false
+  return day.moments.every(
+    (m) =>
+      m.content.trim() && m.classExercises.trim() && m.skills.trim(),
+  )
+}
+
+function isMomentComplete(moment: WeeklyLessonMoment) {
+  return (
+    moment.content.trim() !== '' &&
+    moment.classExercises.trim() !== '' &&
+    moment.skills.trim() !== ''
+  )
 }
 
 function WeeklyLessonDayBlock({
   day,
+  isExpanded,
+  onToggleExpand,
   onDayChange,
   onMomentChange,
+  onCopyFromPrevious,
 }: WeeklyLessonDayBlockProps) {
+  const complete = isDayComplete(day)
+  const [activeMomentIndex, setActiveMomentIndex] = useState(0)
+
+  const safeIndex = Math.min(activeMomentIndex, day.moments.length - 1)
+  const activeMoment = day.moments[safeIndex]
+
   return (
     <section className="weekly-day-card" aria-labelledby={`${day.id}-title`}>
-      <h3 id={`${day.id}-title`}>Dia {formatDatePtBr(day.date)}</h3>
+      <button
+        type="button"
+        className="weekly-day-card__header"
+        onClick={onToggleExpand}
+        aria-expanded={isExpanded}
+        aria-controls={`${day.id}-content`}
+      >
+        <h3 id={`${day.id}-title`}>
+          Dia {formatDatePtBr(day.date)} {complete && <span aria-label="Completo" className="day-complete-check">✅</span>}
+        </h3>
+        <span className="weekly-day-card__chevron">
+          {isExpanded ? '▲' : '▼'}
+        </span>
+      </button>
 
-      <div className="weekly-day-card__fields">
-        <div className="form-field">
-          <div className="form-field__label-row">
-            <label htmlFor={`${day.id}-theme`}>Tema</label>
-            <span>Obrigatório</span>
+      {isExpanded && (
+        <div id={`${day.id}-content`} className="weekly-day-card__body">
+          <div className="weekly-day-card__fields">
+            <div className="form-field">
+              <div className="form-field__label-row">
+                <label htmlFor={`${day.id}-theme`}>Tema</label>
+                <span>Obrigatório</span>
+              </div>
+              <input
+                id={`${day.id}-theme`}
+                type="text"
+                value={day.theme}
+                onChange={(event) =>
+                  onDayChange(day.id, { theme: event.target.value })
+                }
+                placeholder="Ex.: Identidade e família"
+                required
+              />
+            </div>
+
+            <div className="form-field">
+              <div className="form-field__label-row">
+                <label htmlFor={`${day.id}-objective`}>Objetivo</label>
+                <span>Obrigatório</span>
+              </div>
+              <textarea
+                id={`${day.id}-objective`}
+                value={day.objective}
+                onInput={handleTextareaResize}
+                onChange={(event) =>
+                  onDayChange(day.id, { objective: event.target.value })
+                }
+                placeholder="Descreva o objetivo principal do dia"
+                required
+              />
+            </div>
           </div>
-          <input
-            id={`${day.id}-theme`}
-            type="text"
-            value={day.theme}
-            onChange={(event) =>
-              onDayChange(day.id, { theme: event.target.value })
-            }
-            placeholder="Ex.: Identidade e família"
-            required
-          />
-        </div>
 
-        <div className="form-field">
-          <div className="form-field__label-row">
-            <label htmlFor={`${day.id}-objective`}>Objetivo</label>
-            <span>Obrigatório</span>
-          </div>
-          <textarea
-            id={`${day.id}-objective`}
-            value={day.objective}
-            onChange={(event) =>
-              onDayChange(day.id, { objective: event.target.value })
-            }
-            placeholder="Descreva o objetivo principal do dia"
-            required
-          />
-        </div>
-      </div>
+          {day.moments.length > 0 && activeMoment && (
+            <div className="moment-stepper">
+              <div
+                className="moment-stepper__indicators"
+                role="tablist"
+                aria-label="Tempos do dia"
+              >
+                {day.moments.map((moment, index) => {
+                  const completed = isMomentComplete(moment)
+                  const isActive = index === safeIndex
 
-      <div className="weekly-moments">
-        {day.moments.map((moment) => (
-          <WeeklyLessonMomentFields
-            dayId={day.id}
-            moment={moment}
-            key={moment.id}
-            onChange={onMomentChange}
-          />
-        ))}
-      </div>
+                  return (
+                    <button
+                      key={moment.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={isActive}
+                      aria-label={`${moment.periodNumber}º tempo${completed ? ' (preenchido)' : ''}`}
+                      className={
+                        'moment-stepper__indicator' +
+                        (isActive ? ' moment-stepper__indicator--active' : '') +
+                        (completed ? ' moment-stepper__indicator--completed' : '')
+                      }
+                      onClick={() => setActiveMomentIndex(index)}
+                    >
+                      <span className="moment-stepper__indicator-number">
+                        {completed && !isActive ? '✓' : moment.periodNumber}
+                      </span>
+                      <span className="moment-stepper__indicator-label">
+                        {moment.periodNumber}º tempo
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div
+                className="moment-stepper__content"
+                role="tabpanel"
+                aria-label={`${activeMoment.periodNumber}º tempo`}
+                key={activeMoment.id}
+              >
+                <WeeklyLessonMomentFields
+                  dayId={day.id}
+                  moment={activeMoment}
+                  onChange={onMomentChange}
+                />
+              </div>
+
+              <div className="moment-stepper__nav">
+                <button
+                  type="button"
+                  className="secondary-button"
+                  disabled={safeIndex === 0}
+                  onClick={() => setActiveMomentIndex(safeIndex - 1)}
+                >
+                  ← Anterior
+                </button>
+
+                {activeMoment.periodNumber > 1 && (
+                  <button
+                    type="button"
+                    className="secondary-button secondary-button--small moment-stepper__copy"
+                    onClick={() =>
+                      onCopyFromPrevious(day.id, activeMoment.id)
+                    }
+                    title="Copiar informações do tempo anterior"
+                  >
+                    Copiar do anterior
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  className="secondary-button"
+                  disabled={safeIndex === day.moments.length - 1}
+                  onClick={() => setActiveMomentIndex(safeIndex + 1)}
+                >
+                  Próximo →
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </section>
   )
 }
@@ -325,9 +472,7 @@ function WeeklyLessonMomentFields({
   const fieldPrefix = `${dayId}-${moment.id}`
 
   return (
-    <section className="weekly-moment-card">
-      <h4>{moment.periodNumber}º tempo</h4>
-
+    <div className="weekly-moment-fields">
       <div className="form-field">
         <div className="form-field__label-row">
           <label htmlFor={`${fieldPrefix}-content`}>Conteúdo</label>
@@ -336,6 +481,7 @@ function WeeklyLessonMomentFields({
         <textarea
           id={`${fieldPrefix}-content`}
           value={moment.content}
+          onInput={handleTextareaResize}
           onChange={(event) =>
             onChange(dayId, moment.id, { content: event.target.value })
           }
@@ -354,6 +500,7 @@ function WeeklyLessonMomentFields({
         <textarea
           id={`${fieldPrefix}-class-exercises`}
           value={moment.classExercises}
+          onInput={handleTextareaResize}
           onChange={(event) =>
             onChange(dayId, moment.id, {
               classExercises: event.target.value,
@@ -374,6 +521,7 @@ function WeeklyLessonMomentFields({
         <textarea
           id={`${fieldPrefix}-skills`}
           value={moment.skills}
+          onInput={handleTextareaResize}
           onChange={(event) =>
             onChange(dayId, moment.id, { skills: event.target.value })
           }
@@ -381,7 +529,7 @@ function WeeklyLessonMomentFields({
           required
         />
       </div>
-    </section>
+    </div>
   )
 }
 

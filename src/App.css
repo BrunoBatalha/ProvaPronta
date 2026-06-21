@@ -784,9 +784,7 @@
 .weekly-plan-form__fields,
 .weekly-plan-days,
 .weekly-day-card,
-.weekly-day-card__fields,
-.weekly-moments,
-.weekly-moment-card {
+.weekly-day-card__fields {
   display: grid;
   gap: 16px;
 }
@@ -898,35 +896,155 @@
 }
 
 .weekly-day-card {
-  padding: 18px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-background);
+  overflow: hidden;
 }
 
-.weekly-day-card h3,
-.weekly-moment-card h4 {
-  margin: 0;
-  color: var(--color-text-primary);
+.weekly-day-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 18px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.weekly-day-card__header:hover {
+  background: var(--color-surface);
+}
+
+.weekly-day-card__body {
+  padding: 0 18px 18px;
+  border-top: 1px solid var(--color-border);
 }
 
 .weekly-day-card h3 {
+  margin: 0;
+  color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1rem;
+}
+
+.day-complete-check {
+  font-size: 1.1rem;
 }
 
 .weekly-day-card__fields {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.weekly-moment-card {
-  padding: 16px;
+.moment-stepper {
+  display: grid;
+  gap: 16px;
+}
+
+.moment-stepper__indicators {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.moment-stepper__indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.moment-stepper__indicator:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: var(--color-primary-subtle);
+}
+
+.moment-stepper__indicator--active {
+  border-color: var(--color-primary);
+  color: white;
+  background: var(--color-primary);
+}
+
+.moment-stepper__indicator--active:hover {
+  background: var(--color-primary-active);
+}
+
+.moment-stepper__indicator--completed:not(.moment-stepper__indicator--active) {
+  border-color: var(--color-success);
+  color: var(--color-success);
+  background: var(--color-success-soft);
+}
+
+.moment-stepper__indicator-number {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.moment-stepper__indicator--active .moment-stepper__indicator-number {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.moment-stepper__indicator--completed:not(.moment-stepper__indicator--active) .moment-stepper__indicator-number {
+  background: rgba(22, 163, 74, 0.15);
+}
+
+.moment-stepper__indicator-label {
+  white-space: nowrap;
+}
+
+@keyframes moment-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.moment-stepper__content {
+  animation: moment-fade-in 0.2s ease;
+}
+
+.weekly-moment-fields {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
 }
 
-.weekly-moment-card h4 {
-  font-size: 0.9375rem;
+.moment-stepper__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.moment-stepper__copy {
+  margin-inline: auto;
 }
 
 .preview-card {
@@ -1045,11 +1163,14 @@
 .preview-weekly-day {
   display: grid;
   gap: 7px;
+  padding: 16px;
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .preview-weekly-day + .preview-weekly-day {
-  padding-top: 18px;
-  border-top: 1px solid var(--color-border);
+  margin-top: 10px;
 }
 
 .preview-weekly-day h3 {
@@ -1274,7 +1395,12 @@
   .primary-button,
   .secondary-button,
   .danger-button,
-  .activity-image-upload__select {
+  .activity-image-upload__select,
+  .moment-stepper__indicator {
     transition: none;
+  }
+
+  .moment-stepper__content {
+    animation: none;
   }
 }

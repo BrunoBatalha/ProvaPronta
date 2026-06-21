@@ -52,17 +52,66 @@ const initialWeeklyLessonPlan: WeeklyLessonPlan = {
 type GenerationStatus = 'idle' | 'generating' | 'success' | 'error'
 type DocumentModel = 'first' | 'second'
 
+function getInitialGlobalFields() {
+  try {
+    const saved = localStorage.getItem('prova-pronta-globals')
+    if (saved) return JSON.parse(saved)
+  } catch {
+    // ignorar erros
+  }
+  return null
+}
+
+function getInitialWeeklyDraft() {
+  try {
+    const saved = localStorage.getItem('prova-pronta-weekly-draft')
+    if (saved) {
+      const parsed = JSON.parse(saved)
+      return {
+        ...parsed,
+        startDate: parsed.startDate ? new Date(parsed.startDate) : undefined,
+        endDate: parsed.endDate ? new Date(parsed.endDate) : undefined,
+        days: parsed.days
+          ? parsed.days.map((day: any) => ({ ...day, date: new Date(day.date) }))
+          : [],
+      }
+    }
+  } catch {
+    // ignorar erros
+  }
+  return null
+}
+
 function App() {
   const [activeModel, setActiveModel] = useState<DocumentModel>('first')
-  const [schoolInfo, setSchoolInfo] = useState(initialSchoolInfo)
+  
+  const [schoolInfo, setSchoolInfo] = useState(() => {
+    const globals = getInitialGlobalFields()
+    return {
+      ...initialSchoolInfo,
+      teacherName: globals?.teacherName ?? initialSchoolInfo.teacherName,
+      gradeName: globals?.gradeName ?? initialSchoolInfo.gradeName,
+    }
+  })
+  
   const [activities, setActivities] = useState<Activity[]>([])
   const [documentFileName, setDocumentFileName] = useState(() =>
     sanitizeDocxFileName(initialSchoolInfo.activityTitle),
   )
   const [hasCustomFileName, setHasCustomFileName] = useState(false)
-  const [weeklyLessonPlan, setWeeklyLessonPlan] = useState(
-    initialWeeklyLessonPlan,
-  )
+  
+  const [weeklyLessonPlan, setWeeklyLessonPlan] = useState<WeeklyLessonPlan>(() => {
+    const draft = getInitialWeeklyDraft()
+    if (draft) return draft
+
+    const globals = getInitialGlobalFields()
+    return {
+      ...initialWeeklyLessonPlan,
+      teacherName: globals?.teacherName ?? initialWeeklyLessonPlan.teacherName,
+      gradeName: globals?.gradeName ?? initialWeeklyLessonPlan.gradeName,
+    }
+  })
+
   const [weeklyDocumentFileName, setWeeklyDocumentFileName] = useState(() =>
     createWeeklyLessonPlanFileName(initialWeeklyLessonPlan),
   )
@@ -111,6 +160,20 @@ function App() {
     setGenerationErrors([])
     setGenerationStatus('idle')
   }, [activeModel])
+
+  useEffect(() => {
+    localStorage.setItem(
+      'prova-pronta-globals',
+      JSON.stringify({
+        teacherName: activeModel === 'first' ? schoolInfo.teacherName : weeklyLessonPlan.teacherName,
+        gradeName: activeModel === 'first' ? schoolInfo.gradeName : weeklyLessonPlan.gradeName,
+      }),
+    )
+  }, [schoolInfo.teacherName, schoolInfo.gradeName, weeklyLessonPlan.teacherName, weeklyLessonPlan.gradeName, activeModel])
+
+  useEffect(() => {
+    localStorage.setItem('prova-pronta-weekly-draft', JSON.stringify(weeklyLessonPlan))
+  }, [weeklyLessonPlan])
 
   useEffect(() => {
     return () => {
