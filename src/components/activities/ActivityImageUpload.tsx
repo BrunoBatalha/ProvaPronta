@@ -233,7 +233,7 @@ export function ActivityImageUpload({
           onClick={handleOpenFilePicker}
         >
           <strong>Selecionar imagem</strong>
-          <span>PNG, JPG ou JPEG de até 5 MB</span>
+          <span>PNG, JPG ou JPEG de até 10 MB</span>
         </button>
       )}
 

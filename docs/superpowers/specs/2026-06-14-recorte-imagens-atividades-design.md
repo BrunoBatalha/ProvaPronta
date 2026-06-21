@@ -87,7 +87,7 @@ uma imagem e ao desmontar a aplicação.
 ## Erros e Limites
 
 - Continuar aceitando somente PNG, JPG e JPEG.
-- Continuar limitando a imagem original a 5 MB.
+- Continuar limitando a imagem original a 10 MB.
 - Não abrir o editor para arquivos inválidos.
 - Informar quando a imagem não puder ser carregada ou processada.
 - Impedir a confirmação enquanto não houver coordenadas válidas de recorte.

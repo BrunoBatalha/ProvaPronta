@@ -1,6 +1,6 @@
 import type { Activity } from '../types/document.js'
 
-const MAX_ACTIVITY_IMAGE_SIZE = 5 * 1024 * 1024
+const MAX_ACTIVITY_IMAGE_SIZE = 10 * 1024 * 1024
 const ACCEPTED_ACTIVITY_IMAGE_TYPES = new Set(['image/jpeg', 'image/png'])
 const ACCEPTED_ACTIVITY_IMAGE_EXTENSIONS = /\.(jpe?g|png)$/i
 
@@ -58,7 +58,7 @@ export function validateActivityImage(file: File): string | undefined {
   }
 
   if (file.size > MAX_ACTIVITY_IMAGE_SIZE) {
-    return 'Essa imagem é muito grande. Envie uma imagem de até 5 MB.'
+    return 'Essa imagem é muito grande. Envie uma imagem de até 10 MB.'
   }
 
   return undefined

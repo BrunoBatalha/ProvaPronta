@@ -94,6 +94,7 @@ A primeira versão deve conter apenas o necessário para gerar o documento `.doc
 * Documento final editável;
 * Imagens ocupando a largura útil da página;
 * Interface simples, moderna e responsiva.
+* Segundo modelo de documento para plano de aula semanal.
 
 ### Fora do MVP
 
@@ -112,7 +113,7 @@ Não implementar inicialmente:
 * Escolha avançada de fonte, margem ou cor;
 * Controle manual de quebra de página;
 * Biblioteca de imagens;
-* Templates múltiplos;
+* Templates adicionais além dos modelos de atividade e plano semanal;
 * Upload para servidor.
 
 ---
@@ -305,7 +306,7 @@ Para evitar travamentos em dispositivos fracos:
 
 ```txt
 Cabeçalho: até 2 MB
-Imagem de atividade: até 5 MB
+Imagem de atividade: até 10 MB
 Quantidade inicial sugerida: até 15 atividades
 ```
 
@@ -499,6 +500,33 @@ Input de arquivo puro pode parecer técnico e pouco amigável.
 ## 19. Geração do DOCX
 
 A geração deve acontecer localmente no navegador.
+
+### Modelo 2: plano de aula semanal
+
+O segundo modelo gera um plano de aula semanal em `.docx` editável. A usuária
+seleciona um intervalo de dias no calendário, informa professora e série/turma
+uma única vez, define quantos tempos cada dia terá e preenche os blocos diários.
+
+Para cada dia, o documento deve mostrar:
+
+```txt
+DIA dd/mm/aaaa
+
+1º MOMENTO
+TEMA:
+OBJETIVO:
+PROFESSORA:            SÉRIE/TURMA:
+
+1ºTEMPO:
+CONTEÚDO:
+EXERCÍCIOS EM CLASSE:
+HABILIDADES-(CAMPOS DE EXPERIÊNCIA):
+RECURSOS: BIBLIOTECA(  )  SALA DE VÍDEO(  ) PLAYGROUND(  ) QUADRA(    ) OUTROS:SALA DE AULA
+```
+
+O intervalo é inclusivo, limitado a até 7 dias. A quantidade de tempos por dia
+deve ser configurável de 1 a 8, com padrão 4. A linha de recursos é fixa no
+documento e não deve criar controles extras no formulário.
 
 ### Regras do documento
 
@@ -1088,7 +1116,7 @@ As seguintes limitações são aceitas na primeira versão:
 * Não salvar dados após atualizar a página;
 * Não ter login;
 * Não ter histórico;
-* Não permitir múltiplos templates;
+* Não permitir outros templates além dos modelos de atividade e plano semanal;
 * Não permitir edição avançada de layout;
 * Não permitir arrastar para reordenar atividades;
 * Não comprimir imagens automaticamente;
@@ -1108,7 +1136,7 @@ Após validação do MVP, considerar:
 * Permitir escolher tamanho da fonte;
 * Permitir escolher orientação retrato/paisagem;
 * Permitir salvar dados da escola;
-* Permitir múltiplos modelos;
+* Permitir novos modelos;
 * Criar login;
 * Criar backend;
 * Criar banco de dados;

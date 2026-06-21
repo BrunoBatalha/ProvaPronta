@@ -11,6 +11,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/react": "^3.36.0",
+    "@emotion/react": "^11.14.0",
     "docx": "^9.7.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",

@@ -25,3 +25,28 @@ export type CropArea = {
   width: number
   height: number
 }
+
+export type WeeklyLessonPlan = {
+  startDate?: Date
+  endDate?: Date
+  teacherName: string
+  gradeName: string
+  periodsPerDay: number
+  days: WeeklyLessonDay[]
+}
+
+export type WeeklyLessonDay = {
+  id: string
+  date: Date
+  theme: string
+  objective: string
+  moments: WeeklyLessonMoment[]
+}
+
+export type WeeklyLessonMoment = {
+  id: string
+  periodNumber: number
+  content: string
+  classExercises: string
+  skills: string
+}

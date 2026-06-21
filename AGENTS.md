@@ -135,3 +135,9 @@ Use `pnpm`, nao `npm` ou `yarn`, para manter `pnpm-lock.yaml` consistente.
   produto que altere o escopo documentado.
 - Ao encontrar divergencia entre o codigo e `docs/ABOUT.md`, sinalizar a
   divergencia e preservar a regra documentada, salvo instrucao contraria.
+
+## Perguntas ao usuario
+
+Quando uma pergunta mudar uma decisao de produto, implementacao, escopo ou UX,
+o agente deve aguardar a resposta da usuaria. Nao usar auto-resolucao por tempo
+nem assumir respostas padrao apos timeout.
